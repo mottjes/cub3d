@@ -26,6 +26,14 @@ double ft_abs(double nbr)
     return (nbr);
 }
 
+void    my_pixel_put(t_game *game, int x, int y, int color)
+{
+    char    *dst;
+
+    dst = game->img->addr + (y * game->img->line_length + x * (game->img->bits_per_pixel / 8));
+    *(unsigned int*)dst = color;
+}
+
 void    draw_vertical_line(t_game *game, int x, int color)
 {
     int y;
@@ -42,20 +50,83 @@ void    draw_vertical_line(t_game *game, int x, int color)
     y = game->ray->drawStart;
     while (y < game->ray->drawEnd)
     {
-        mlx_pixel_put(game->mlx, game->window, x, y, color);
+        my_pixel_put(game, x, y, color);
+        // mlx_pixel_put(game->mlx, game->window, x, y, color);
         y++;
     }
 }
 
+void    render_sqare(t_game *game, int mapX, int mapY)
+{
+    int x;
+    int y;
+    int size;
+
+    size = 16;
+    x = mapX * size;
+    while(x < mapX * size + size)
+    {
+        y = mapY * size;
+        while(y < mapY * size + size)
+        {
+            my_pixel_put(game, x, y, 0xFFFFFF);
+            y++;
+        }
+        x++;
+    }
+}
+
+void    render_player(t_game *game)
+{
+    int x;
+    int y;
+
+    x = game->player->posX * 16 - 4;
+    while (x < game->player->posX * 16 + 4)
+    {
+        y = game->player->posY * 16 - 4;
+        while (y < game->player->posY * 16 + 4)
+        {
+            my_pixel_put(game, x, y, 0xFF0000);
+            y++;
+        }
+        x++;
+    }
+}
+
+void    render_map(t_game *game)
+{
+    int mapX;
+    int mapY;
+
+    mapX = 0;
+    while (mapX < 24)
+    {
+        mapY = 0;
+        while (mapY < 24)
+        {
+            if (map[mapX][mapY])
+                render_sqare(game ,mapX, mapY);
+            mapY++;
+        }
+        mapX++;
+    }
+    render_player(game);
+}
+
 void    render(t_game *game, t_ray *ray)
 {
-    int color;
-    int x;
+    t_img       img;
+    int         color;
+    int         x;
     
     x = 0;
+    img.img = mlx_new_image(game->mlx, screenWidth, screenHeight);
+    img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length, &img.endian);
+    game->img = &img;
     while (x < screenWidth)
     {
-        ray->cameraX = 2 * x / (double)screenHeight - 1;
+        ray->cameraX = 2 * x / (double)screenWidth - 1;
         ray->dirX = game->player->dirX + ray->planeX * ray->cameraX;
         ray->dirY = game->player->dirY + ray->planeY * ray->cameraX;
 
@@ -140,10 +211,14 @@ void    render(t_game *game, t_ray *ray)
         ray->drawEnd = ray->lineHeight / 2 + screenHeight / 2;
         if (ray->drawEnd >= screenHeight)
             ray->drawEnd = screenHeight - 1;
-
+        
         draw_vertical_line(game, x, color);
         x++;
     }
+    mlx_clear_window(game->mlx, game->window);
+    render_map(game);
+    mlx_put_image_to_window(game->mlx, game->window, game->img->img, 0, 0);
+    game->img = NULL;
 }
 
 int    key_hook(int keysym, t_game *game)
@@ -196,19 +271,28 @@ int    key_hook(int keysym, t_game *game)
         game->ray->planeX = game->ray->planeX * cos(rotSpeed) - game->ray->planeY * sin(rotSpeed);
         game->ray->planeY = oldPlaneX * sin(rotSpeed) + game->ray->planeY * cos(rotSpeed);
     }
-    mlx_clear_window(game->mlx, game->window);
     render(game, game->ray);
     return 0;
 }
 
+int    exit_game(t_game *game)
+{
+    mlx_destroy_display(game->mlx);
+    mlx_destroy_window(game->mlx, game->window);
+    exit(0);
+    return (0);
+}
+
+//one side turn -> streched
 int main(void)
 {
     t_game      game;
     t_player    player;
     t_ray       ray;
-    
+
     init_game(&game, &player, &ray);
     render(&game, &ray);
     mlx_hook(game.window, 2, 1L<<0, key_hook, &game);
+    mlx_hook(game.window, 17, 0L, exit_game,  &game);
     mlx_loop(game.mlx);
 }   

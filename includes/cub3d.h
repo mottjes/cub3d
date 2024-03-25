@@ -7,10 +7,10 @@
 #include <math.h>
 #include "../minilibx-linux/mlx.h"
 
-#define screenWidth     1024
-#define screenHeight    512
-#define moveSpeed       0.24
-#define rotSpeed        0.02
+#define screenWidth     1920
+#define screenHeight    1080
+#define moveSpeed       0.5
+#define rotSpeed        0.2
 #define KEY_ESC         65307
 #define KEY_W           115
 #define KEY_S           119
@@ -18,6 +18,16 @@
 #define KEY_D           100
 #define KEY_RIGHT       65363
 #define KEY_LEFT        65361
+
+typedef struct s_img
+{
+    void    *img;
+    char    *addr;
+    int     bits_per_pixel;
+    int     line_length;
+    int     endian;
+}       t_img;
+
 
 typedef struct s_ray
 {
@@ -56,6 +66,7 @@ typedef struct s_game
     void        *window;
     t_player    *player;
     t_ray       *ray;
+    t_img       *img;
 }       t_game;
 
 int map[24][24]=
