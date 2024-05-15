@@ -45,35 +45,17 @@ void    render(t_game *game, t_ray *ray)
     // int         color;
     int         x;
     
-	int buffer[SCREEN_HEIGHT][SCREEN_WIDTH];
+	// int buffer[SCREEN_HEIGHT][SCREEN_WIDTH];
 	int texture[16384];
-
-	// for(int x = 0; x < texWidth; x++)
-	// {
-	// 	for(int y = 0; y < texHeight; y++)
-  	// 	{
-    // // int xorcolor = (x * 256 / texWidth) ^ (y * 256 / texHeight);
-    // // //int xcolor = x * 256 / texWidth;
-    // // int ycolor = y * 256 / texHeight;
-    // // int xycolor = y * 128 / texHeight + x * 128 / texWidth;
-    // // texture[0][texWidth * y + x] = 65536 * 254 * (x != y && x != texWidth - y); //flat red texture with black cross
-    // // texture[1][texWidth * y + x] = xycolor + 256 * xycolor + 65536 * xycolor; //sloped greyscale
-    // // texture[2][texWidth * y + x] = 256 * xycolor + 65536 * xycolor; //sloped yellow gradient
-    // // texture[3][texWidth * y + x] = xorcolor + 256 * xorcolor + 65536 * xorcolor; //xor greyscale
-    // // texture[4][texWidth * y + x] = 256 * xorcolor; //xor green
-    // texture[texWidth * y + x] = 65536 * 192 * (x % 16 && y % 16); //red bricks
-    // // texture[6][texWidth * y + x] = 65536 * ycolor; //red gradient
-    // // texture[7][texWidth * y + x] = 128 + 256 * 128 + 65536 * 128; //flat grey texture
-  	// 	}
-	// }
+    int texture2[1024];
 
 
 	t_img	img2;
-	char	*relative_path = "./shrader.xpm";
+	char	*path1 = "./shrader.xpm";
 	int		img_width;
 	int		img_height;
 
-	img2.img = mlx_xpm_file_to_image(game->mlx, relative_path, &img_width, &img_height);
+	img2.img = mlx_xpm_file_to_image(game->mlx, path1, &img_width, &img_height);
 	char *mlx_data_addr = mlx_get_data_addr(img2.img, &img2.bits_per_pixel, &img2.line_length, &img2.endian);
 	for (int x = 0; x < img_width; x++)
 	{
@@ -84,7 +66,21 @@ void    render(t_game *game, t_ray *ray)
 		}
 	}
 
-	
+	t_img   img3;
+    char    *path2 = "./Brick_wall.xpm";
+    int		img_width2;
+	int		img_height2;
+
+    img3.img = mlx_xpm_file_to_image(game->mlx, path2, &img_width2, &img_height2);
+	char *mlx_data_addr2 = mlx_get_data_addr(img3.img, &img3.bits_per_pixel, &img3.line_length, &img3.endian);
+	for (int x = 0; x < img_width2; x++)
+	{
+		for (int y = 0; y < img_height2; y++)
+		{
+			int pos = (y * img3.line_length + x * (img3.bits_per_pixel / 8));
+			texture2[32 * y + x] = *(unsigned int *)(mlx_data_addr2 + pos);
+		}
+	}
 
 
     x = 0;
@@ -186,40 +182,85 @@ void    render(t_game *game, t_ray *ray)
       else           wallX = game->player->posX + game->ray->perpWallDist * game->ray->dirX;
       wallX -= floor((wallX));
 
-      //x coordinate on the texture
+        if (game->ray->side)
+        {
+ //x coordinate on the texture
+      int texX = (int)(wallX * (double)32);
+      if(game->ray->side == 0 && game->ray->dirX > 0) texX = 32 - texX - 1;
+      if(game->ray->side == 1 && game->ray->dirY < 0) texX = 32 - texX - 1;
+
+	    double step = 1.0 * 32 / game->ray->lineHeight;
+        // Starting texture coordinate
+        double texPos = (game->ray->drawStart - SCREEN_HEIGHT / 2 + game->ray->lineHeight / 2) * step;
+        for(int y = game->ray->drawStart; y < game->ray->drawEnd; y++)
+        {
+            // Cast the texture coordinate to integer, and mask with (texHeight - 1) in case of overflow
+            int texY = (int)texPos & (32 - 1);
+            texPos += step;
+            int color = texture2[32 * texY + texX];
+       
+            //make color darker for y-sides: R, G and B byte each divided through two with a "shift" and an "and"
+            if(game->ray->side == 1) color = (color >> 1) & 8355711;
+            // buffer[y][x] = color;
+            my_pixel_put(game, x, y, color);
+   	    }
+
+        //      ceiling rendering
+        for(int y = 0; y < game->ray->drawStart; y++)
+            my_pixel_put(game, x, y, 0x245cb5);
+            // buffer[y][x] = 0x245cb5;
+
+        //      floor rendering
+        for (int y = game->ray->drawEnd; y < SCREEN_HEIGHT; y++)
+            my_pixel_put(game, x, y, 0x15428a);
+            // buffer[y][x] = 0x15428a;
+        }
+        else
+        {
+ //x coordinate on the texture
       int texX = (int)(wallX * (double)texWidth);
       if(game->ray->side == 0 && game->ray->dirX > 0) texX = texWidth - texX - 1;
       if(game->ray->side == 1 && game->ray->dirY < 0) texX = texWidth - texX - 1;
 
-	 double step = 1.0 * texHeight / game->ray->lineHeight;
-      // Starting texture coordinate
-      double texPos = (game->ray->drawStart - SCREEN_HEIGHT / 2 + game->ray->lineHeight / 2) * step;
-      for(int y = game->ray->drawStart; y < game->ray->drawEnd; y++)
-      {
-        // Cast the texture coordinate to integer, and mask with (texHeight - 1) in case of overflow
-        int texY = (int)texPos & (texHeight - 1);
-        texPos += step;
-        int color = texture[texHeight * texY + texX];
-        //make color darker for y-sides: R, G and B byte each divided through two with a "shift" and an "and"
-        if(game->ray->side == 1) color = (color >> 1) & 8355711;
-        buffer[y][x] = color;
-   		}
+	    double step = 1.0 * texHeight / game->ray->lineHeight;
+        // Starting texture coordinate
+        double texPos = (game->ray->drawStart - SCREEN_HEIGHT / 2 + game->ray->lineHeight / 2) * step;
+        for(int y = game->ray->drawStart; y < game->ray->drawEnd; y++)
+        {
+            // Cast the texture coordinate to integer, and mask with (texHeight - 1) in case of overflow
+            int texY = (int)texPos & (texHeight - 1);
+            texPos += step;
+            int color = texture[texHeight * texY + texX];
+       
+            //make color darker for y-sides: R, G and B byte each divided through two with a "shift" and an "and"
+            if(game->ray->side == 1) color = (color >> 1) & 8355711;
+                my_pixel_put(game, x, y, color);
+            // buffer[y][x] = color;
+   	    }
 
+        //      ceiling rendering
+        for(int y = 0; y < game->ray->drawStart; y++)
+            my_pixel_put(game, x, y, 0x245cb5);
+            // buffer[y][x] = 0x245cb5;
 
+        //      floor rendering
+        for (int y = game->ray->drawEnd; y < SCREEN_HEIGHT; y++)
+         my_pixel_put(game, x, y, 0x15428a);
+            // buffer[y][x] = 0x15428a;
+        }
+     
         x++;
     }
 
-	for (int x = 0; x < SCREEN_WIDTH; x++)
-	{
-		for (int y = 0; y < SCREEN_HEIGHT; y++)
-		{
-			my_pixel_put(game, x, y, buffer[y][x]);
-		}
-	}
+	// for (int x = 0; x < SCREEN_WIDTH; x++)
+	// {
+	// 	for (int y = 0; y < SCREEN_HEIGHT; y++)
+	// 	{
+	// 		my_pixel_put(game, x, y, buffer[y][x]);
+	// 	}
+	// }
 
-    for(int y = 0; y < SCREEN_HEIGHT; y++) for(int x = 0; x < SCREEN_WIDTH; x++) buffer[y][x] = 0; //clear the buffer instead of cls()
-
-
+    // for(int y = 0; y < SCREEN_HEIGHT; y++) for(int x = 0; x < SCREEN_WIDTH; x++) buffer[y][x] = 0; //clear the buffer instead of cls()
 
 
 

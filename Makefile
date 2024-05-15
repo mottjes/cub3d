@@ -20,6 +20,7 @@ MLX_FLAGS = -L$(MLX_PATH) -lmlx_Linux -lX11 -lXext -lm
 all: $(NAME) $(OBJ)
 
 $(NAME): $(OBJ)
+	$(MAKE) -C ./minilibx-linux
 	$(CC) $(CFLAGS) $(OBJ) -o $(NAME) $(MLX_FLAGS) libft/libft.a
 
 %.o: %.c

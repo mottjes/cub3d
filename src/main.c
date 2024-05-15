@@ -30,15 +30,15 @@ int map[24][24]=
 
 int	main(void)
 {
-	t_game 		game;
-	t_player	player;
+  	t_game 		game;
+  	t_player	player;
 	t_ray		ray;
 
 	init_game(&game, &player, &ray);
 
 	render(&game, &ray);
 
-    mlx_hook(game.window, 2, 1L<<0, key_hook, &game);
-    mlx_hook(game.window, 17, 0L, exit_game,  &game);
-    mlx_loop(game.mlx);
+	mlx_hook(game.window, 2, 1L<<0, key_hook, &game);
+	mlx_hook(game.window, 17, 0L, exit_game,  &game);
+	mlx_loop(game.mlx);
 }
