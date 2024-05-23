@@ -16,15 +16,18 @@ OBJ = $(SRC:.c=.o)
 
 MLX_PATH = ./minilibx-linux
 
+LIBFT_PATH = ./libft
+
 MLX_NAME = libmlx.a
 
 MLX_FLAGS = -L$(MLX_PATH) -lmlx_Linux -lX11 -lXext -lm
 
-all: $(NAME) $(OBJ)
+all: $(NAME) $(OBJ) $(LIBFT)
 
 $(NAME): $(OBJ)
-	$(MAKE) -C ./minilibx-linux
-	$(CC) $(CFLAGS) $(OBJ) -o $(NAME) $(MLX_FLAGS) libft/libft.a
+	$(MAKE) -C $(MLX_PATH)
+	$(MAKE) -C $(LIBFT_PATH)
+	$(CC) $(CFLAGS) $(OBJ) -o $(NAME) $(MLX_FLAGS) $(LIBFT_PATH)/libft.a
 
 %.o: %.c
 	$(CC) $(CFLAGS) -I./minilibx-linux -c -o $@ $<
@@ -32,6 +35,7 @@ $(NAME): $(OBJ)
 clean:
 	rm -f $(OBJ)
 	make -C $(MLX_PATH) clean
+	make -C $(LIBFT_PATH) fclean
 	
 fclean: clean
 	rm -f $(NAME)
