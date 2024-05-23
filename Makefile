@@ -1,13 +1,16 @@
 NAME = cub3d
 
 SRC = 	src/main.c					\
+		src/exit.c					\
 		src/key_hook.c				\
 		src/init.c					\
 		src/render.c				\
+		src/calculations.c			\
+		src/texture.c   			\
 
 CC = gcc
 
-CFLAGS = -Wall -Wextra -Werror -no-pie
+CFLAGS = #-Wall -Wextra -Werror -no-pie
 
 OBJ = $(SRC:.c=.o)
 

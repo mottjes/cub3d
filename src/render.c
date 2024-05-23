@@ -1,270 +1,123 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   render.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mottjes <mottjes@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/05/23 12:21:56 by mottjes           #+#    #+#             */
+/*   Updated: 2024/05/23 13:17:37 by mottjes          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/cub3d.h"
 
-extern int map[24][24];
-
-double ft_abs(double nbr)
+void	my_pixel_put(t_img *frame, int x, int y, int color)
 {
-    if (nbr < 0)
-        nbr *= -1;
-    return (nbr);
+	char	*dst;
+
+	dst = frame->addr + (y * frame->line_length + x * (frame->bits_per_pixel / 8));
+	*(unsigned int*)dst = color;
 }
 
-void    my_pixel_put(t_game *game, int x, int y, int color)
+void	render_texture(int x, t_game *game)
 {
-    char    *dst;
+	double wallX;
+	int texX;
+	double step;
+	double texPos;
+	int color; 
+	int texY;
 
-    dst = game->img->addr + (y * game->img->line_length + x * (game->img->bits_per_pixel / 8));
-    *(unsigned int*)dst = color;
-}
+	t_texture *texture;
 
-void    draw_vertical_line(t_game *game, int x, int color)
-{
-    int y;
-
-    if (game->ray->side)
-    {
-        if (color == 0xFF0000)
-            color = 0xDD0000;
-        if (color == 0x00FF00)
-            color = 0x00DD00;
-        if (color == 0x0000FF)
-            color = 0x0000DD;
-    }
-    y = game->ray->drawStart;
-    while (y < game->ray->drawEnd)
-    {
-        my_pixel_put(game, x, y, color);
-        // mlx_pixel_put(game->mlx, game->window, x, y, color);
-        y++;
-    }
-}
-
-void    render(t_game *game, t_ray *ray)
-{
-    t_img       img;
-    // int         color;
-    int         x;
-    
-	// int buffer[SCREEN_HEIGHT][SCREEN_WIDTH];
-	int texture[16384];
-    int texture2[1024];
-
-
-	t_img	img2;
-	char	*path1 = "./shrader.xpm";
-	int		img_width;
-	int		img_height;
-
-	img2.img = mlx_xpm_file_to_image(game->mlx, path1, &img_width, &img_height);
-	char *mlx_data_addr = mlx_get_data_addr(img2.img, &img2.bits_per_pixel, &img2.line_length, &img2.endian);
-	for (int x = 0; x < img_width; x++)
+	if (game->ray.side)
 	{
-		for (int y = 0; y < img_height; y++)
-		{
-			int pos = (y * img2.line_length + x * (img2.bits_per_pixel / 8));
-			texture[texWidth * y + x] = *(unsigned int *)(mlx_data_addr + pos);
-		}
+		if (game->ray.dirY < 0)
+			texture = &game->texture_we;
+		else
+			texture = &game->texture_no;
 	}
-
-	t_img   img3;
-    char    *path2 = "./Brick_wall.xpm";
-    int		img_width2;
-	int		img_height2;
-
-    img3.img = mlx_xpm_file_to_image(game->mlx, path2, &img_width2, &img_height2);
-	char *mlx_data_addr2 = mlx_get_data_addr(img3.img, &img3.bits_per_pixel, &img3.line_length, &img3.endian);
-	for (int x = 0; x < img_width2; x++)
+	else
 	{
-		for (int y = 0; y < img_height2; y++)
-		{
-			int pos = (y * img3.line_length + x * (img3.bits_per_pixel / 8));
-			texture2[32 * y + x] = *(unsigned int *)(mlx_data_addr2 + pos);
-		}
+		if (game->ray.dirX < 0)
+			texture = &game->texture_so;
+		else
+			texture = &game->texture_ea;
 	}
+	   
 
+	if (game->ray.side == 0) 
+		wallX = game->player.posY + game->ray.perpWallDist * game->ray.dirY;
+	else
+		wallX = game->player.posX + game->ray.perpWallDist * game->ray.dirX;
+	wallX -= floor((wallX));
+	texX = (int)(wallX * (double)texture->width);
+	if(game->ray.side == 0 && game->ray.dirX > 0)
+		texX = texture->width - texX - 1;
+	if(game->ray.side == 1 && game->ray.dirY < 0)
+		texX = texture->width - texX - 1;
+	step = 1.0 * texture->height / game->ray.lineHeight;
+	texPos = (game->ray.drawStart - SCREEN_HEIGHT / 2 + game->ray.lineHeight / 2) * step;
+	for(int y = game->ray.drawStart; y < game->ray.drawEnd; y++)
+	{
+		texY = (int)texPos & (texture->height - 1);
+		texPos += step;
+		int pos;
 
-    x = 0;
-    img.img = mlx_new_image(game->mlx, SCREEN_WIDTH, SCREEN_HEIGHT);
-    img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length, &img.endian);
-    game->img = &img;
-    while (x < SCREEN_WIDTH)
-    {
-        ray->cameraX = 2 * x / (double)SCREEN_WIDTH - 1;
-        ray->dirX = game->player->dirX + ray->planeX * ray->cameraX;
-        ray->dirY = game->player->dirY + ray->planeY * ray->cameraX;
+		pos = (texY * texture->img.line_length + texX * (texture->img.bits_per_pixel / 8));
+		color = *(unsigned int *)(texture->img.addr + pos);
+		if(game->ray.side == 1) 
+			color = (color >> 1) & 8355711;
+		my_pixel_put(&game->frame, x, y, color);
+	}
+}
 
-        //calcutalting the distance the ray has to travel to do one x or y step
-        if (ray->dirX == 0)
-            ray->dirX = 0.00001;
-        ray->deltaDistX =  ft_abs(1 / ray->dirX);
-        if (ray->dirY == 0)
-            ray->dirY = 0.00001;
-        ray->deltaDistY = ft_abs(1 / ray->dirY);
-        //in which box of the map we are in
-        ray->mapX = (int)game->player->posX;
-        ray->mapY = (int)game->player->posY;
+void	render_floor_ceiling(int x, t_game *game)
+{
+	int	y;
 
-        //set hit flag to 0
-        ray->hit = 0;
+	y = 0;
+	while (y < game->ray.drawStart)
+	{
+		my_pixel_put(&game->frame, x, y, game->color_ceiling);
+		y++;
+	}
+	y = game->ray.drawEnd;
+	while (y < SCREEN_HEIGHT)
+	{
+		my_pixel_put(&game->frame, x, y, game->color_floor);
+		y++;
+	}
+}
 
-        //calulate step abd initial sideDist
-        if (ray->dirX < 0)
-        {
-            ray->stepX = -1;
-            ray->sideDistX = (game->player->posX - ray->mapX) * ray->deltaDistX;
-        }
-        else
-        {
-            ray->stepX = 1;
-            ray->sideDistX = (ray->mapX + 1 - game->player->posX) * ray->deltaDistX;
-        }
-        if (ray->dirY < 0)
-        {
-            ray->stepY = -1;
-            ray->sideDistY = (game->player->posY - ray->mapY) * ray->deltaDistY;
-        }
-        else
-        {
-            ray->stepY = 1;
-            ray->sideDistY = (ray->mapY + 1 - game->player->posY) * ray->deltaDistY;
-        }
+void	render_line(int x, t_game *game, t_ray *ray)
+{
+	set_ray(x, game, ray);
+	calculate_sidedist(game, ray);
+	dda(ray);
+	calculate_line_height(ray);
+	render_texture(x, game);
+	render_floor_ceiling(x, game);
+}
 
-        //perform DDA
-        while (ray->hit == 0)
-        {
-            //jumps to the next map-grid intersection
-            if (ray->sideDistX < ray->sideDistY)
-            {
-                ray->sideDistX += ray->deltaDistX;
-                ray->mapX += ray->stepX;
-                ray->side = 0;
-            }
-            else
-            {
-                ray->sideDistY += ray->deltaDistY;
-                ray->mapY += ray->stepY;
-                ray->side = 1;
-            }
-            //check if ray hits wall
-            if (map[ray->mapX][ray->mapY] > 0)
-            {
-                ray->hit = 1;
-                // if (map[ray->mapX][ray->mapY] == 1)
-                //     color = 0xFF0000;
-                // else if (map[ray->mapX][ray->mapY] == 2)
-                //     color = 0x00FF00;
-                // else if (map[ray->mapX][ray->mapY] == 3)
-                //     color = 0x0000FF;
-                // else if (map[ray->mapX][ray->mapY] == 4)
-                //     color = 0xFF0000;
-            }     
-        }
-        //set wall to player distance 
-        if (ray->side == 0)
-            ray->perpWallDist = (ray->sideDistX - ray->deltaDistX);
-        else
-            ray->perpWallDist = (ray->sideDistY - ray->deltaDistY);
+void	render(t_game *game)
+{
+	t_img	img;
+	int		x;
 
-        //calulate line height
-        ray->lineHeight = (int)(SCREEN_HEIGHT / ray->perpWallDist);
-        ray->drawStart = - ray->lineHeight / 2 + SCREEN_HEIGHT / 2;
-        if (ray->drawStart < 0)
-            ray->drawStart = 0;
-        ray->drawEnd = ray->lineHeight / 2 + SCREEN_HEIGHT / 2;
-        if (ray->drawEnd >= SCREEN_HEIGHT)
-            ray->drawEnd = SCREEN_HEIGHT - 1;
-        
-        // draw_vertical_line(game, x, color);
-
-      //calculate value of wallX
-      double wallX; //where exactly the wall was hit
-      if (game->ray->side == 0) wallX = game->player->posY + game->ray->perpWallDist * game->ray->dirY;
-      else           wallX = game->player->posX + game->ray->perpWallDist * game->ray->dirX;
-      wallX -= floor((wallX));
-
-        if (game->ray->side)
-        {
- //x coordinate on the texture
-      int texX = (int)(wallX * (double)32);
-      if(game->ray->side == 0 && game->ray->dirX > 0) texX = 32 - texX - 1;
-      if(game->ray->side == 1 && game->ray->dirY < 0) texX = 32 - texX - 1;
-
-	    double step = 1.0 * 32 / game->ray->lineHeight;
-        // Starting texture coordinate
-        double texPos = (game->ray->drawStart - SCREEN_HEIGHT / 2 + game->ray->lineHeight / 2) * step;
-        for(int y = game->ray->drawStart; y < game->ray->drawEnd; y++)
-        {
-            // Cast the texture coordinate to integer, and mask with (texHeight - 1) in case of overflow
-            int texY = (int)texPos & (32 - 1);
-            texPos += step;
-            int color = texture2[32 * texY + texX];
-       
-            //make color darker for y-sides: R, G and B byte each divided through two with a "shift" and an "and"
-            if(game->ray->side == 1) color = (color >> 1) & 8355711;
-            // buffer[y][x] = color;
-            my_pixel_put(game, x, y, color);
-   	    }
-
-        //      ceiling rendering
-        for(int y = 0; y < game->ray->drawStart; y++)
-            my_pixel_put(game, x, y, 0x245cb5);
-            // buffer[y][x] = 0x245cb5;
-
-        //      floor rendering
-        for (int y = game->ray->drawEnd; y < SCREEN_HEIGHT; y++)
-            my_pixel_put(game, x, y, 0x15428a);
-            // buffer[y][x] = 0x15428a;
-        }
-        else
-        {
- //x coordinate on the texture
-      int texX = (int)(wallX * (double)texWidth);
-      if(game->ray->side == 0 && game->ray->dirX > 0) texX = texWidth - texX - 1;
-      if(game->ray->side == 1 && game->ray->dirY < 0) texX = texWidth - texX - 1;
-
-	    double step = 1.0 * texHeight / game->ray->lineHeight;
-        // Starting texture coordinate
-        double texPos = (game->ray->drawStart - SCREEN_HEIGHT / 2 + game->ray->lineHeight / 2) * step;
-        for(int y = game->ray->drawStart; y < game->ray->drawEnd; y++)
-        {
-            // Cast the texture coordinate to integer, and mask with (texHeight - 1) in case of overflow
-            int texY = (int)texPos & (texHeight - 1);
-            texPos += step;
-            int color = texture[texHeight * texY + texX];
-       
-            //make color darker for y-sides: R, G and B byte each divided through two with a "shift" and an "and"
-            if(game->ray->side == 1) color = (color >> 1) & 8355711;
-                my_pixel_put(game, x, y, color);
-            // buffer[y][x] = color;
-   	    }
-
-        //      ceiling rendering
-        for(int y = 0; y < game->ray->drawStart; y++)
-            my_pixel_put(game, x, y, 0x245cb5);
-            // buffer[y][x] = 0x245cb5;
-
-        //      floor rendering
-        for (int y = game->ray->drawEnd; y < SCREEN_HEIGHT; y++)
-         my_pixel_put(game, x, y, 0x15428a);
-            // buffer[y][x] = 0x15428a;
-        }
-     
-        x++;
-    }
-
-	// for (int x = 0; x < SCREEN_WIDTH; x++)
-	// {
-	// 	for (int y = 0; y < SCREEN_HEIGHT; y++)
-	// 	{
-	// 		my_pixel_put(game, x, y, buffer[y][x]);
-	// 	}
-	// }
-
-    // for(int y = 0; y < SCREEN_HEIGHT; y++) for(int x = 0; x < SCREEN_WIDTH; x++) buffer[y][x] = 0; //clear the buffer instead of cls()
-
-
-
-    mlx_clear_window(game->mlx, game->window);
-    mlx_put_image_to_window(game->mlx, game->window, game->img->img, 0, 0);
-    game->img = NULL;
+	x = 0;
+	img.img = mlx_new_image(game->mlx, SCREEN_WIDTH, SCREEN_HEIGHT);
+	img.addr = mlx_get_data_addr(img.img,
+			&img.bits_per_pixel, &img.line_length, &img.endian);
+	game->frame = &img;
+	while (x < SCREEN_WIDTH)
+	{
+		render_line(x, game, &game->ray);
+		x++;
+	}
+	mlx_clear_window(game->mlx, game->window);
+	mlx_put_image_to_window(game->mlx, game->window, game->frame->img, 0, 0);
+	mlx_destroy_image(game->mlx, game->frame->img);
+	game->frame = NULL;
 }
