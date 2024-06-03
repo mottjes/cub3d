@@ -6,11 +6,13 @@
 /*   By: mottjes <mottjes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 12:21:56 by mottjes           #+#    #+#             */
-/*   Updated: 2024/05/23 13:17:37 by mottjes          ###   ########.fr       */
+/*   Updated: 2024/06/03 16:01:24 by mottjes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/cub3d.h"
+
+extern int	map[24][24];
 
 void	my_pixel_put(t_img *frame, int x, int y, int color)
 {
@@ -45,7 +47,6 @@ void	render_texture(int x, t_game *game)
 		else
 			texture = &game->texture_ea;
 	}
-	   
 
 	if (game->ray.side == 0) 
 		wallX = game->player.posY + game->ray.perpWallDist * game->ray.dirY;
@@ -69,7 +70,7 @@ void	render_texture(int x, t_game *game)
 		color = *(unsigned int *)(texture->img.addr + pos);
 		if(game->ray.side == 1) 
 			color = (color >> 1) & 8355711;
-		my_pixel_put(&game->frame, x, y, color);
+		my_pixel_put(game->frame, x, y, color);
 	}
 }
 
@@ -78,15 +79,15 @@ void	render_floor_ceiling(int x, t_game *game)
 	int	y;
 
 	y = 0;
-	while (y < game->ray.drawStart)
+	while (y < game->ray.drawStart && y < (SCREEN_HEIGHT / 2))
 	{
-		my_pixel_put(&game->frame, x, y, game->color_ceiling);
+		my_pixel_put(game->frame, x, y, game->color_ceiling);
 		y++;
 	}
 	y = game->ray.drawEnd;
-	while (y < SCREEN_HEIGHT)
+	while (y < SCREEN_HEIGHT && y > 0)
 	{
-		my_pixel_put(&game->frame, x, y, game->color_floor);
+		my_pixel_put(game->frame, x, y, game->color_floor);
 		y++;
 	}
 }
@@ -94,11 +95,42 @@ void	render_floor_ceiling(int x, t_game *game)
 void	render_line(int x, t_game *game, t_ray *ray)
 {
 	set_ray(x, game, ray);
-	calculate_sidedist(game, ray);
+	calculate_side_dist(game, ray);
 	dda(ray);
 	calculate_line_height(ray);
 	render_texture(x, game);
 	render_floor_ceiling(x, game);
+}
+
+void	render_mini_map(t_game *game)
+{
+	int x;
+	int y;
+
+	x = 100;
+	while (x <= 105)
+	{
+		y = 100;
+		while (y <= 105)
+		{
+			my_pixel_put(game->frame, x, y, 0xFF0000);
+			y++;
+		}
+		x++;
+	}
+
+	x = 10;
+	while (x <= 210)
+	{
+		y = 10;
+		while (y <= 210)
+		{
+			if (map[(int)game->player.posX + (x - 105) / 10][(int)game->player.posY + (y - 105) / 10])
+				my_pixel_put(game->frame, x, y, 0xFFFF00);
+			y++;
+		}
+		x++;
+	}
 }
 
 void	render(t_game *game)
@@ -116,6 +148,7 @@ void	render(t_game *game)
 		render_line(x, game, &game->ray);
 		x++;
 	}
+	render_mini_map(game);
 	mlx_clear_window(game->mlx, game->window);
 	mlx_put_image_to_window(game->mlx, game->window, game->frame->img, 0, 0);
 	mlx_destroy_image(game->mlx, game->frame->img);

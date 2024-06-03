@@ -6,7 +6,7 @@
 /*   By: mottjes <mottjes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 12:21:46 by mottjes           #+#    #+#             */
-/*   Updated: 2024/05/23 13:00:28 by mottjes          ###   ########.fr       */
+/*   Updated: 2024/06/03 15:14:04 by mottjes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,8 @@ int main(void)
 	game.color_floor = 0x15428a;
 	game.texture_no.path = "./textures/porsche.xpm";
 	game.texture_so.path = "./textures/shrader.xpm";
-	game.texture_ea.path = "./textures/brick.xpm";
-	game.texture_we.path = "./textures/brick.xpm";
+	game.texture_ea.path = "./textures/ralph.xpm";
+	game.texture_we.path = "./textures/shrek.xpm";
 	//
 	init_mlx(&game);
 	init_ray(&game.ray, &game.player);
@@ -65,3 +65,5 @@ int main(void)
 	mlx_loop(game.mlx);
 	exit_game(&game);
 }
+
+// 	texturen mit unterschiedlicher laenge und hoehe

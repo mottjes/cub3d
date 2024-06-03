@@ -6,23 +6,47 @@
 /*   By: mottjes <mottjes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 12:21:39 by mottjes           #+#    #+#             */
-/*   Updated: 2024/05/23 12:31:42 by mottjes          ###   ########.fr       */
+/*   Updated: 2024/06/03 15:05:59 by mottjes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/cub3d.h"
 
-void	move_player(t_game *game, int dir)
+extern int	map[24][24];
+
+void	move_player_w_s(t_game *game, int dir)
 {
 	if (dir > 0)
 	{
-		game->player.posX += game->player.dirX * MOVE_SPEED;
-		game->player.posY += game->player.dirY * MOVE_SPEED;
+		if(map[(int)(game->player.posX + game->player.dirX * MOVE_SPEED)][(int)game->player.posY] == 0) 
+			game->player.posX += game->player.dirX * MOVE_SPEED;
+    	if(map[(int)game->player.posX][(int)(game->player.posY + game->player.dirY * MOVE_SPEED)] == 0) 
+			game->player.posY += game->player.dirY * MOVE_SPEED;
 	}
 	else if (dir < 0)
 	{
-		game->player.posX -= game->player.dirX * MOVE_SPEED;
-		game->player.posY -= game->player.dirY * MOVE_SPEED;
+		if(map[(int)game->player.posX][(int)(game->player.posY + game->player.dirY * MOVE_SPEED)] == 0) 
+			game->player.posX -= game->player.dirX * MOVE_SPEED;
+		if(map[(int)(game->player.posX + game->player.dirX * MOVE_SPEED)][(int)game->player.posY] == 0) 
+			game->player.posY -= game->player.dirY * MOVE_SPEED;
+	}
+}
+
+void	move_player_a_d(t_game *game, int dir)
+{
+	if (dir > 0)
+	{
+		if (map[(int)(game->player.posX -= game->player.dirY * MOVE_SPEED)][(int)game->player.posY] == 0)
+			game->player.posX -= game->player.dirY * MOVE_SPEED;
+    	if(map[(int)game->player.posX][(int)(game->player.posY += game->player.dirX * MOVE_SPEED * MOVE_SPEED)] == 0) 
+			game->player.posY += game->player.dirX * MOVE_SPEED;
+	}
+	else if (dir < 0)
+	{
+		if (map[(int)(game->player.posX -= game->player.dirY * MOVE_SPEED)][(int)game->player.posY] == 0)
+			game->player.posX += game->player.dirY * MOVE_SPEED;
+    	if(map[(int)game->player.posX][(int)(game->player.posY += game->player.dirX * MOVE_SPEED * MOVE_SPEED)] == 0) 
+			game->player.posY -= game->player.dirX * MOVE_SPEED;
 	}
 }
 
@@ -56,9 +80,13 @@ int	key_hook(int keysym, t_game *game)
 	if (keysym == KEY_ESC)
 		exit_game(game);
 	if (keysym == KEY_W)
-		move_player(game, 1);
+		move_player_w_s(game, 1);
 	if (keysym == KEY_S)
-		move_player(game, -1);
+		move_player_w_s(game, -1);
+	if (keysym == KEY_A)
+		move_player_a_d(game, 1);
+	if (keysym == KEY_D)
+		move_player_a_d(game, -1);
 	if (keysym == KEY_LEFT)
 		rotate_player(&game->player, &game->ray, false);
 	if (keysym == KEY_RIGHT)

@@ -12,7 +12,7 @@
 #define SCREEN_WIDTH 	1920
 #define	SCREEN_HEIGHT  	1080
 
-#define MOVE_SPEED      0.5
+#define MOVE_SPEED      0.45
 #define ROT_SPEED       0.2
 #define FOV             0.66
 
