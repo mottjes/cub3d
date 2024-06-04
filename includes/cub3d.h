@@ -86,6 +86,7 @@ typedef struct s_game
     int         **map;
     int         color_ceiling;
     int         color_floor;
+    int         buffer[SCREEN_HEIGHT][SCREEN_WIDTH];
 }       t_game;
 
 //      init.c
@@ -107,6 +108,9 @@ void    calculate_line_height(t_ray *ray);
 
 //      texture.c
 void    load_textures(t_game *game);
+
+//      minimap.c
+void	render_minimap(t_game *game);
 
 //      exit.c
 void    free_all(t_game *game);

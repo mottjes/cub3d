@@ -6,7 +6,7 @@
 /*   By: mottjes <mottjes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 12:21:56 by mottjes           #+#    #+#             */
-/*   Updated: 2024/06/03 16:01:24 by mottjes          ###   ########.fr       */
+/*   Updated: 2024/06/04 16:51:01 by mottjes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,17 +52,17 @@ void	render_texture(int x, t_game *game)
 		wallX = game->player.posY + game->ray.perpWallDist * game->ray.dirY;
 	else
 		wallX = game->player.posX + game->ray.perpWallDist * game->ray.dirX;
-	wallX -= floor((wallX));
+	wallX -= floor(wallX);
 	texX = (int)(wallX * (double)texture->width);
 	if(game->ray.side == 0 && game->ray.dirX > 0)
 		texX = texture->width - texX - 1;
 	if(game->ray.side == 1 && game->ray.dirY < 0)
 		texX = texture->width - texX - 1;
 	step = 1.0 * texture->height / game->ray.lineHeight;
-	texPos = (game->ray.drawStart - SCREEN_HEIGHT / 2 + game->ray.lineHeight / 2) * step;
+	texPos = (game->ray.drawStart - SCREEN_HEIGHT / 2.0 + game->ray.lineHeight / 2.0) * step;
 	for(int y = game->ray.drawStart; y < game->ray.drawEnd; y++)
 	{
-		texY = (int)texPos & (texture->height - 1);
+		texY = (int)texPos;// & (texture->height - 1);
 		texPos += step;
 		int pos;
 
@@ -102,42 +102,11 @@ void	render_line(int x, t_game *game, t_ray *ray)
 	render_floor_ceiling(x, game);
 }
 
-void	render_mini_map(t_game *game)
-{
-	int x;
-	int y;
-
-	x = 100;
-	while (x <= 105)
-	{
-		y = 100;
-		while (y <= 105)
-		{
-			my_pixel_put(game->frame, x, y, 0xFF0000);
-			y++;
-		}
-		x++;
-	}
-
-	x = 10;
-	while (x <= 210)
-	{
-		y = 10;
-		while (y <= 210)
-		{
-			if (map[(int)game->player.posX + (x - 105) / 10][(int)game->player.posY + (y - 105) / 10])
-				my_pixel_put(game->frame, x, y, 0xFFFF00);
-			y++;
-		}
-		x++;
-	}
-}
-
 void	render(t_game *game)
 {
 	t_img	img;
 	int		x;
-
+	
 	x = 0;
 	img.img = mlx_new_image(game->mlx, SCREEN_WIDTH, SCREEN_HEIGHT);
 	img.addr = mlx_get_data_addr(img.img,
@@ -148,7 +117,7 @@ void	render(t_game *game)
 		render_line(x, game, &game->ray);
 		x++;
 	}
-	render_mini_map(game);
+	render_minimap(game);
 	mlx_clear_window(game->mlx, game->window);
 	mlx_put_image_to_window(game->mlx, game->window, game->frame->img, 0, 0);
 	mlx_destroy_image(game->mlx, game->frame->img);

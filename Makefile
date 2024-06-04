@@ -6,6 +6,7 @@ SRC = 	src/main.c					\
 		src/init.c					\
 		src/render.c				\
 		src/calculations.c			\
+		src/minimap.c				\
 		src/texture.c   			\
 
 CC = gcc
