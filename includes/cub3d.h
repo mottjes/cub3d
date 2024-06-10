@@ -84,36 +84,39 @@ typedef struct s_game
     t_texture   texture_ea;
     t_texture   texture_we;
     int         **map;
+    int         map_widht;
+    int         map_height;
     int         color_ceiling;
     int         color_floor;
     int         buffer[SCREEN_HEIGHT][SCREEN_WIDTH];
 }       t_game;
 
 //      init.c
-void    init_mlx(t_game *game);
-void    init_ray(t_ray *ray, t_player *player);
+void        init_mlx(t_game *game);
+void        init_ray(t_ray *ray, t_player *player);
 
 //      key_hook.c
-int    key_hook(int keysym, t_game *game);
+int         key_hook(int keysym, t_game *game);
 
 //      render.c
-void    render(t_game *game);
+void        render(t_game *game);
 
 //      calculations.c
-double	ft_abs(double nbr);
-void	set_ray(int x, t_game *game, t_ray *ray);
-void	calculate_side_dist(t_game *game, t_ray *ray);
-void	dda(t_ray *ray);
-void    calculate_line_height(t_ray *ray);
+double	    ft_abs(double nbr);
+void	    set_ray(int x, t_game *game, t_ray *ray);
+void	    calculate_side_dist(t_game *game, t_ray *ray);
+void	    dda(t_ray *ray);
+void        calculate_line_height(t_ray *ray);
 
 //      texture.c
-void    load_textures(t_game *game);
+t_texture	*choose_texture(t_game *game);
+void        load_textures(t_game *game);
 
 //      minimap.c
-void	render_minimap(t_game *game);
+void	    render_minimap(t_game *game);
 
 //      exit.c
-void    free_all(t_game *game);
-int    exit_game(t_game *game);
+void        free_all(t_game *game);
+int         exit_game(t_game *game);
 
 #endif

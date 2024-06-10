@@ -6,11 +6,29 @@
 /*   By: mottjes <mottjes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 12:22:10 by mottjes           #+#    #+#             */
-/*   Updated: 2024/06/04 12:57:04 by mottjes          ###   ########.fr       */
+/*   Updated: 2024/06/06 15:16:25 by mottjes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/cub3d.h"
+
+t_texture	*choose_texture(t_game *game)
+{
+	if (game->ray.side)
+	{
+		if (game->ray.dirY < 0)
+			return (&game->texture_we);
+		else
+			return (&game->texture_no);
+	}
+	else
+	{
+		if (game->ray.dirX < 0)
+			return (&game->texture_so);
+		else
+			return (&game->texture_ea);
+	}
+}
 
 void	create_img(t_game *game, t_texture *texture)
 {

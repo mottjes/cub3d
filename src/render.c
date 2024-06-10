@@ -6,7 +6,7 @@
 /*   By: mottjes <mottjes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 12:21:56 by mottjes           #+#    #+#             */
-/*   Updated: 2024/06/04 16:51:01 by mottjes          ###   ########.fr       */
+/*   Updated: 2024/06/06 16:39:14 by mottjes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,57 +18,43 @@ void	my_pixel_put(t_img *frame, int x, int y, int color)
 {
 	char	*dst;
 
-	dst = frame->addr + (y * frame->line_length + x * (frame->bits_per_pixel / 8));
-	*(unsigned int*)dst = color;
+	dst = frame->addr + (y * frame->line_length
+			+ x * (frame->bits_per_pixel / 8));
+	*(unsigned int *)dst = color;
 }
 
 void	render_texture(int x, t_game *game)
 {
-	double wallX;
-	int texX;
-	double step;
-	double texPos;
-	int color; 
-	int texY;
+	t_texture	*texture;
+	double		wall_x;
+	int			tex_x;
+	int			tex_y;
+	double		step;
+	double		tex_pos;
+	int			color;
 
-	t_texture *texture;
-
-	if (game->ray.side)
-	{
-		if (game->ray.dirY < 0)
-			texture = &game->texture_we;
-		else
-			texture = &game->texture_no;
-	}
+	texture = choose_texture(game);
+	if (game->ray.side == 0)
+		wall_x = game->player.posY + game->ray.perpWallDist * game->ray.dirY;
 	else
-	{
-		if (game->ray.dirX < 0)
-			texture = &game->texture_so;
-		else
-			texture = &game->texture_ea;
-	}
-
-	if (game->ray.side == 0) 
-		wallX = game->player.posY + game->ray.perpWallDist * game->ray.dirY;
-	else
-		wallX = game->player.posX + game->ray.perpWallDist * game->ray.dirX;
-	wallX -= floor(wallX);
-	texX = (int)(wallX * (double)texture->width);
-	if(game->ray.side == 0 && game->ray.dirX > 0)
-		texX = texture->width - texX - 1;
-	if(game->ray.side == 1 && game->ray.dirY < 0)
-		texX = texture->width - texX - 1;
+		wall_x = game->player.posX + game->ray.perpWallDist * game->ray.dirX;
+	wall_x -= floor(wall_x);
+	tex_x = (int)(wall_x * (double)texture->width);
+	if (game->ray.side == 0 && game->ray.dirX > 0)
+		tex_x = texture->width - tex_x - 1;
+	if (game->ray.side == 1 && game->ray.dirY < 0)
+		tex_x = texture->width - tex_x - 1;
 	step = 1.0 * texture->height / game->ray.lineHeight;
-	texPos = (game->ray.drawStart - SCREEN_HEIGHT / 2.0 + game->ray.lineHeight / 2.0) * step;
-	for(int y = game->ray.drawStart; y < game->ray.drawEnd; y++)
+	tex_pos = (game->ray.drawStart - SCREEN_HEIGHT / 2.0 + game->ray.lineHeight / 2.0) * step;
+	for (int y = game->ray.drawStart; y < game->ray.drawEnd; y++)
 	{
-		texY = (int)texPos;// & (texture->height - 1);
-		texPos += step;
-		int pos;
+		tex_y = (int)tex_pos;
+		tex_pos += step;
+		int	pos;
 
-		pos = (texY * texture->img.line_length + texX * (texture->img.bits_per_pixel / 8));
+		pos = (tex_y * texture->img.line_length + tex_x * (texture->img.bits_per_pixel / 8));
 		color = *(unsigned int *)(texture->img.addr + pos);
-		if(game->ray.side == 1) 
+		if (game->ray.side == 1)
 			color = (color >> 1) & 8355711;
 		my_pixel_put(game->frame, x, y, color);
 	}
@@ -106,7 +92,7 @@ void	render(t_game *game)
 {
 	t_img	img;
 	int		x;
-	
+
 	x = 0;
 	img.img = mlx_new_image(game->mlx, SCREEN_WIDTH, SCREEN_HEIGHT);
 	img.addr = mlx_get_data_addr(img.img,

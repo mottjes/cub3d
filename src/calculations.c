@@ -6,7 +6,7 @@
 /*   By: mottjes <mottjes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 13:08:28 by mottjes           #+#    #+#             */
-/*   Updated: 2024/06/03 12:31:11 by mottjes          ###   ########.fr       */
+/*   Updated: 2024/06/06 15:53:11 by mottjes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,8 @@ void	dda(t_ray *ray)
 
 void	calculate_line_height(t_ray *ray)
 {
+	if (ray->perpWallDist == 0)
+		ray->perpWallDist = 0.00001;
 	ray->lineHeight = (int)(SCREEN_HEIGHT / ray->perpWallDist);
 	ray->drawStart = -ray->lineHeight / 2 + SCREEN_HEIGHT / 2;
 	if (ray->drawStart < 0)
