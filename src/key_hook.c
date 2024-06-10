@@ -6,7 +6,7 @@
 /*   By: mottjes <mottjes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 12:21:39 by mottjes           #+#    #+#             */
-/*   Updated: 2024/06/06 15:52:21 by mottjes          ###   ########.fr       */
+/*   Updated: 2024/06/10 14:48:04 by mottjes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,38 +14,55 @@
 
 extern int	map[24][24];
 
-void	move_player_w_s(t_player *p, int dir)
+bool	collision(t_game *game, double x, double y)
+{
+	if (map[(int)(x + 0.1)][(int)y])
+		return (true);
+	if (map[(int)(x + 0.1)][(int)(y + 0.1)])
+		return (true);
+	if (map[(int)x][(int)(y + 0.1)])
+		return (true);
+	if (map[(int)(x - 0.1)][(int)y])
+		return (true);
+	if (map[(int)x][(int)(y - 0.1)])
+		return (true);
+	if (map[(int)(x - 0.1)][(int)(y - 0.1)])
+		return (true);
+	return (false);
+}
+
+void	move_player_w_s(t_game *game, t_player *p, int dir)
 {
 	if (dir > 0)
 	{
-		if (!map[(int)(p->posX + p->dirX * (MOVE_SPEED + 0.1))][(int)p->posY])
+		if (!collision(game, p->posX + p->dirX * MOVE_SPEED, p->posY))
 			p->posX += p->dirX * MOVE_SPEED;
-		if (!map[(int)p->posX][(int)(p->posY + p->dirY * (MOVE_SPEED + 0.1))])
+		if (!collision(game, p->posX, p->posY + p->dirY * MOVE_SPEED))
 			p->posY += p->dirY * MOVE_SPEED;
 	}
 	else if (dir < 0)
 	{
-		if (!map[(int)p->posX][(int)(p->posY - p->dirY * (MOVE_SPEED + 0.1))])
-			p->posY -= p->dirY * MOVE_SPEED;
-		if (!map[(int)(p->posX - p->dirX * (MOVE_SPEED + 0.1))][(int)p->posY])
+		if (!collision(game, p->posX - p->dirX * MOVE_SPEED, p->posY))
 			p->posX -= p->dirX * MOVE_SPEED;
+		if (!collision(game, p->posX, p->posY - p->dirY * MOVE_SPEED))
+			p->posY -= p->dirY * MOVE_SPEED;
 	}
 }
 
-void	move_player_a_d(t_player *p, int dir)
+void	move_player_a_d(t_game *game, t_player *p, int dir)
 {
 	if (dir > 0)
 	{
-		if (!map[(int)(p->posX - p->dirY * (MOVE_SPEED + 0.1))][(int)p->posY])
+		if (!collision(game, p->posX - p->dirY * MOVE_SPEED, p->posY))
 			p->posX -= p->dirY * MOVE_SPEED;
-		if (!map[(int)p->posX][(int)(p->posY + p->dirX * (MOVE_SPEED + 0.1))])
+		if (!collision(game, p->posX, p->posY + p->dirX * MOVE_SPEED))
 			p->posY += p->dirX * MOVE_SPEED;
 	}
 	else if (dir < 0)
 	{
-		if (!map[(int)(p->posX + p->dirY * (MOVE_SPEED + 0.2))][(int)p->posY])
+		if (!collision(game, p->posX + p->dirY * MOVE_SPEED, p->posY))
 			p->posX += p->dirY * MOVE_SPEED;
-		if (!map[(int)p->posX][(int)(p->posY - p->dirX * (MOVE_SPEED + 0.2))])
+		if (!collision(game, p->posX, p->posY - p->dirX * MOVE_SPEED))
 			p->posY -= p->dirX * MOVE_SPEED;
 	}
 }
@@ -80,13 +97,13 @@ int	key_hook(int keysym, t_game *game)
 	if (keysym == KEY_ESC)
 		exit_game(game);
 	if (keysym == KEY_W)
-		move_player_w_s(&game->player, 1);
+		move_player_w_s(game, &game->player, 1);
 	if (keysym == KEY_S)
-		move_player_w_s(&game->player, -1);
+		move_player_w_s(game, &game->player, -1);
 	if (keysym == KEY_A)
-		move_player_a_d(&game->player, 1);
+		move_player_a_d(game, &game->player, 1);
 	if (keysym == KEY_D)
-		move_player_a_d(&game->player, -1);
+		move_player_a_d(game, &game->player, -1);
 	if (keysym == KEY_LEFT)
 		rotate_player(&game->player, &game->ray, false);
 	if (keysym == KEY_RIGHT)

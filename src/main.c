@@ -6,7 +6,7 @@
 /*   By: mottjes <mottjes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 12:21:46 by mottjes           #+#    #+#             */
-/*   Updated: 2024/06/06 16:37:19 by mottjes          ###   ########.fr       */
+/*   Updated: 2024/06/10 13:29:51 by mottjes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,6 @@ int main(void)
 	game.texture_ea.path = "./textures/supermoto.xpm";
 	game.texture_we.path = "./textures/shrek.xpm";
 	// 
-
 	init_mlx(&game);
 	init_ray(&game.ray, &game.player);
 	load_textures(&game);
