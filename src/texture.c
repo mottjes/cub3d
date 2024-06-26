@@ -6,11 +6,20 @@
 /*   By: mottjes <mottjes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 12:22:10 by mottjes           #+#    #+#             */
-/*   Updated: 2024/06/06 15:16:25 by mottjes          ###   ########.fr       */
+/*   Updated: 2024/06/26 15:50:59 by mottjes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/cub3d.h"
+
+void	my_pixel_put(t_img *frame, int x, int y, int color)
+{
+	char	*dst;
+
+	dst = frame->addr + (y * frame->line_length
+			+ x * (frame->bits_per_pixel / 8));
+	*(unsigned int *)dst = color;
+}
 
 t_texture	*choose_texture(t_game *game)
 {

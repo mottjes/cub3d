@@ -6,7 +6,7 @@
 /*   By: mottjes <mottjes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 12:21:56 by mottjes           #+#    #+#             */
-/*   Updated: 2024/06/06 16:39:14 by mottjes          ###   ########.fr       */
+/*   Updated: 2024/06/26 15:56:20 by mottjes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,24 +14,37 @@
 
 extern int	map[24][24];
 
-void	my_pixel_put(t_img *frame, int x, int y, int color)
+void	draw_line(t_game *game, int tex_x, double tex_pos, double step)
 {
-	char	*dst;
+	t_texture	*texture;
+	int			y;
+	int			tex_y;
+	int			color;
+	int			pos;
 
-	dst = frame->addr + (y * frame->line_length
-			+ x * (frame->bits_per_pixel / 8));
-	*(unsigned int *)dst = color;
+	texture = choose_texture(game);
+	y = game->ray.drawStart;
+	while (y < game->ray.drawEnd)
+	{
+		tex_y = (int)tex_pos;
+		tex_pos += step;
+		pos = (tex_y * texture->img.line_length + tex_x
+				* (texture->img.bits_per_pixel / 8));
+		color = *(unsigned int *)(texture->img.addr + pos);
+		if (game->ray.side == 1)
+			color = (color >> 1) & 8355711;
+		my_pixel_put(game->frame, game->x, y, color);
+		y++;
+	}
 }
 
-void	render_texture(int x, t_game *game)
+void	render_texture_line(int x, t_game *game)
 {
 	t_texture	*texture;
 	double		wall_x;
 	int			tex_x;
-	int			tex_y;
 	double		step;
 	double		tex_pos;
-	int			color;
 
 	texture = choose_texture(game);
 	if (game->ray.side == 0)
@@ -45,19 +58,10 @@ void	render_texture(int x, t_game *game)
 	if (game->ray.side == 1 && game->ray.dirY < 0)
 		tex_x = texture->width - tex_x - 1;
 	step = 1.0 * texture->height / game->ray.lineHeight;
-	tex_pos = (game->ray.drawStart - SCREEN_HEIGHT / 2.0 + game->ray.lineHeight / 2.0) * step;
-	for (int y = game->ray.drawStart; y < game->ray.drawEnd; y++)
-	{
-		tex_y = (int)tex_pos;
-		tex_pos += step;
-		int	pos;
-
-		pos = (tex_y * texture->img.line_length + tex_x * (texture->img.bits_per_pixel / 8));
-		color = *(unsigned int *)(texture->img.addr + pos);
-		if (game->ray.side == 1)
-			color = (color >> 1) & 8355711;
-		my_pixel_put(game->frame, x, y, color);
-	}
+	tex_pos = (game->ray.drawStart - SCREEN_HEIGHT / 2.0
+			+ game->ray.lineHeight / 2.0) * step;
+	game->x = x;
+	draw_line(game, tex_x, tex_pos, step);
 }
 
 void	render_floor_ceiling(int x, t_game *game)
@@ -84,7 +88,7 @@ void	render_line(int x, t_game *game, t_ray *ray)
 	calculate_side_dist(game, ray);
 	dda(ray);
 	calculate_line_height(ray);
-	render_texture(x, game);
+	render_texture_line(x, game);
 	render_floor_ceiling(x, game);
 }
 

@@ -88,7 +88,7 @@ typedef struct s_game
     int         map_height;
     int         color_ceiling;
     int         color_floor;
-    int         buffer[SCREEN_HEIGHT][SCREEN_WIDTH];
+    int         x;
 }       t_game;
 
 //      init.c
@@ -109,6 +109,7 @@ void	    dda(t_ray *ray);
 void        calculate_line_height(t_ray *ray);
 
 //      texture.c
+void	    my_pixel_put(t_img *frame, int x, int y, int color);
 t_texture	*choose_texture(t_game *game);
 void        load_textures(t_game *game);
 
