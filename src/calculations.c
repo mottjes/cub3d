@@ -6,7 +6,7 @@
 /*   By: mottjes <mottjes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 13:08:28 by mottjes           #+#    #+#             */
-/*   Updated: 2024/06/10 14:25:17 by mottjes          ###   ########.fr       */
+/*   Updated: 2024/08/28 17:52:26 by mottjes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,43 +21,47 @@ double	ft_abs(double nbr)
 	return (nbr);
 }
 
-void	set_ray(int x, t_game *game, t_ray *ray)
+void	set_ray(t_game *game, t_ray *ray, int x)
 {
-	ray->cameraX = 2 * x / (double)SCREEN_WIDTH - 1;
-	ray->dirX = game->player.dirX + ray->planeX * ray->cameraX;
-	ray->dirY = game->player.dirY + ray->planeY * ray->cameraX;
-	if (ray->dirX == 0)
-		ray->dirX = 0.00001;
-	ray->deltaDistX = ft_abs(1 / ray->dirX);
-	if (ray->dirY == 0)
-		ray->dirY = 0.00001;
-	ray->deltaDistY = ft_abs(1 / ray->dirY);
-	ray->mapX = (int)game->player.posX;
-	ray->mapY = (int)game->player.posY;
+	ray->camera_x = 2 * x / (double)SCREEN_WIDTH - 1;
+	ray->dir_x = game->player.dir_x + ray->plane_x * ray->camera_x;
+	ray->dir_y = game->player.dir_y + ray->plane_y * ray->camera_x;
+	if (ray->dir_x == 0)
+		ray->dir_x = 0.00001;
+	ray->delta_dist_x = ft_abs(1 / ray->dir_x);
+	if (ray->dir_y == 0)
+		ray->dir_y = 0.00001;
+	ray->delta_dist_y = ft_abs(1 / ray->dir_y);
+	ray->map_x = (int)game->player.pos_x;
+	ray->map_y = (int)game->player.pos_y;
 	ray->hit = 0;
 }
 
 void	calculate_side_dist(t_game *game, t_ray *ray)
 {
-	if (ray->dirX < 0)
+	if (ray->dir_x < 0)
 	{
-		ray->stepX = -1;
-		ray->sideDistX = (game->player.posX - ray->mapX) * ray->deltaDistX;
+		ray->step_x = -1;
+		ray->side_dist_x = (game->player.pos_x - ray->map_x)
+			* ray->delta_dist_x;
 	}
 	else
 	{
-		ray->stepX = 1;
-		ray->sideDistX = (ray->mapX + 1 - game->player.posX) * ray->deltaDistX;
+		ray->step_x = 1;
+		ray->side_dist_x = (ray->map_x + 1 - game->player.pos_x)
+			* ray->delta_dist_x;
 	}
-	if (ray->dirY < 0)
+	if (ray->dir_y < 0)
 	{
-		ray->stepY = -1;
-		ray->sideDistY = (game->player.posY - ray->mapY) * ray->deltaDistY;
+		ray->step_y = -1;
+		ray->side_dist_y = (game->player.pos_y - ray->map_y)
+			* ray->delta_dist_y;
 	}
 	else
 	{
-		ray->stepY = 1;
-		ray->sideDistY = (ray->mapY + 1 - game->player.posY) * ray->deltaDistY;
+		ray->step_y = 1;
+		ray->side_dist_y = (ray->map_y + 1 - game->player.pos_y)
+			* ray->delta_dist_y;
 	}
 }
 
@@ -65,34 +69,34 @@ void	dda(t_ray *ray)
 {
 	while (ray->hit == 0)
 	{
-		if (ray->sideDistX < ray->sideDistY)
+		if (ray->side_dist_x < ray->side_dist_y)
 		{
-			ray->sideDistX += ray->deltaDistX;
-			ray->mapX += ray->stepX;
+			ray->side_dist_x += ray->delta_dist_x;
+			ray->map_x += ray->step_x;
 			ray->side = 0;
 		}
 		else
 		{
-			ray->sideDistY += ray->deltaDistY;
-			ray->mapY += ray->stepY;
+			ray->side_dist_y += ray->delta_dist_y;
+			ray->map_y += ray->step_y;
 			ray->side = 1;
 		}
-		if (map[ray->mapX][ray->mapY] != 0)
+		if (map[ray->map_x][ray->map_y] != 0)
 			ray->hit = 1;
 	}
 	if (ray->side == 0)
-		ray->perpWallDist = (ray->sideDistX - ray->deltaDistX);
+		ray->perp_wall_dist = (ray->side_dist_x - ray->delta_dist_x);
 	else
-		ray->perpWallDist = (ray->sideDistY - ray->deltaDistY);
+		ray->perp_wall_dist = (ray->side_dist_y - ray->delta_dist_y);
 }
 
 void	calculate_line_height(t_ray *ray)
 {
-	ray->lineHeight = (int)(SCREEN_HEIGHT / ray->perpWallDist);
-	ray->drawStart = -ray->lineHeight / 2 + SCREEN_HEIGHT / 2;
-	if (ray->drawStart < 0)
-		ray->drawStart = 0;
-	ray->drawEnd = ray->lineHeight / 2 + SCREEN_HEIGHT / 2;
-	if (ray->drawEnd >= SCREEN_HEIGHT)
-		ray->drawEnd = SCREEN_HEIGHT - 1;
+	ray->line_height = (int)(SCREEN_HEIGHT / ray->perp_wall_dist);
+	ray->draw_start = -ray->line_height / 2 + SCREEN_HEIGHT / 2;
+	if (ray->draw_start < 0)
+		ray->draw_start = 0;
+	ray->draw_end = ray->line_height / 2 + SCREEN_HEIGHT / 2;
+	if (ray->draw_end >= SCREEN_HEIGHT)
+		ray->draw_end = SCREEN_HEIGHT - 1;
 }

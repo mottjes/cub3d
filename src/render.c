@@ -6,7 +6,7 @@
 /*   By: mottjes <mottjes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 12:21:56 by mottjes           #+#    #+#             */
-/*   Updated: 2024/06/26 15:56:20 by mottjes          ###   ########.fr       */
+/*   Updated: 2024/08/28 17:59:28 by mottjes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,67 +14,61 @@
 
 extern int	map[24][24];
 
-void	draw_line(t_game *game, int tex_x, double tex_pos, double step)
+void	render_texture_line_2(t_game *game, t_texture *texture, int x)
 {
-	t_texture	*texture;
-	int			y;
-	int			tex_y;
-	int			color;
-	int			pos;
+	t_tex	*tex;
+	int		y;
 
-	texture = choose_texture(game);
-	y = game->ray.drawStart;
-	while (y < game->ray.drawEnd)
+	tex = &game->tex;
+	y = game->ray.draw_start;
+	while (y < game->ray.draw_end)
 	{
-		tex_y = (int)tex_pos;
-		tex_pos += step;
-		pos = (tex_y * texture->img.line_length + tex_x
+		tex->tex_y = (int)tex->tex_pos;
+		tex->tex_pos += tex->step;
+		tex->pos = (tex->tex_y * texture->img.line_length + tex->tex_x
 				* (texture->img.bits_per_pixel / 8));
-		color = *(unsigned int *)(texture->img.addr + pos);
+		tex->color = *(unsigned int *)(texture->img.addr + tex->pos);
 		if (game->ray.side == 1)
-			color = (color >> 1) & 8355711;
-		my_pixel_put(game->frame, game->x, y, color);
+			tex->color = (tex->color >> 1) & 8355711;
+		my_pixel_put(game->frame, x, y, tex->color);
 		y++;
 	}
 }
 
-void	render_texture_line(int x, t_game *game)
+void	render_texture_line(t_game *game, t_ray *ray, int x)
 {
 	t_texture	*texture;
-	double		wall_x;
-	int			tex_x;
-	double		step;
-	double		tex_pos;
+	t_tex		*tex;
 
+	tex = &game->tex;
 	texture = choose_texture(game);
-	if (game->ray.side == 0)
-		wall_x = game->player.posY + game->ray.perpWallDist * game->ray.dirY;
+	if (ray->side == 0)
+		tex->wall_x = game->player.pos_y + ray->perp_wall_dist * ray->dir_y;
 	else
-		wall_x = game->player.posX + game->ray.perpWallDist * game->ray.dirX;
-	wall_x -= floor(wall_x);
-	tex_x = (int)(wall_x * (double)texture->width);
-	if (game->ray.side == 0 && game->ray.dirX > 0)
-		tex_x = texture->width - tex_x - 1;
-	if (game->ray.side == 1 && game->ray.dirY < 0)
-		tex_x = texture->width - tex_x - 1;
-	step = 1.0 * texture->height / game->ray.lineHeight;
-	tex_pos = (game->ray.drawStart - SCREEN_HEIGHT / 2.0
-			+ game->ray.lineHeight / 2.0) * step;
-	game->x = x;
-	draw_line(game, tex_x, tex_pos, step);
+		tex->wall_x = game->player.pos_x + ray->perp_wall_dist * ray->dir_x;
+	tex->wall_x -= floor(tex->wall_x);
+	tex->tex_x = (int)(tex->wall_x * (double)texture->width);
+	if (ray->side == 0 && ray->dir_x > 0)
+		tex->tex_x = texture->width - tex->tex_x - 1;
+	if (ray->side == 1 && ray->dir_y < 0)
+		tex->tex_x = texture->width - tex->tex_x - 1;
+	tex->step = 1.0 * texture->height / ray->line_height;
+	tex->tex_pos = (ray->draw_start - SCREEN_HEIGHT / 2.0
+			+ ray->line_height / 2.0) * tex->step;
+	render_texture_line_2(game, texture, x);
 }
 
-void	render_floor_ceiling(int x, t_game *game)
+void	render_floor_ceiling(t_game *game, int x)
 {
 	int	y;
 
 	y = 0;
-	while (y < game->ray.drawStart && y < (SCREEN_HEIGHT / 2))
+	while (y < game->ray.draw_start && y < (SCREEN_HEIGHT / 2))
 	{
 		my_pixel_put(game->frame, x, y, game->color_ceiling);
 		y++;
 	}
-	y = game->ray.drawEnd;
+	y = game->ray.draw_end;
 	while (y < SCREEN_HEIGHT && y > 0)
 	{
 		my_pixel_put(game->frame, x, y, game->color_floor);
@@ -84,12 +78,12 @@ void	render_floor_ceiling(int x, t_game *game)
 
 void	render_line(int x, t_game *game, t_ray *ray)
 {
-	set_ray(x, game, ray);
+	set_ray(game, ray, x);
 	calculate_side_dist(game, ray);
 	dda(ray);
 	calculate_line_height(ray);
-	render_texture_line(x, game);
-	render_floor_ceiling(x, game);
+	render_texture_line(game, ray, x);
+	render_floor_ceiling(game, x);
 }
 
 void	render(t_game *game)

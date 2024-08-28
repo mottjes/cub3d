@@ -6,7 +6,7 @@
 /*   By: mottjes <mottjes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 12:21:52 by mottjes           #+#    #+#             */
-/*   Updated: 2024/05/23 12:59:05 by mottjes          ###   ########.fr       */
+/*   Updated: 2024/08/28 17:44:45 by mottjes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@ void	init_mlx(t_game *game)
 
 void	init_ray(t_ray *ray, t_player *player)
 {
-	ray->dirX = player->dirX;
-	ray->dirY = player->dirY;
-	ray->planeX = ray->dirY * FOV;
-	ray->planeY = ray->dirX * -FOV;
+	ray->dir_x = player->dir_x;
+	ray->dir_y = player->dir_y;
+	ray->plane_x = ray->dir_y * FOV;
+	ray->plane_y = ray->dir_x * -FOV;
 }

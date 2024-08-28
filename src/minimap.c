@@ -6,7 +6,7 @@
 /*   By: mottjes <mottjes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 16:51:19 by mottjes           #+#    #+#             */
-/*   Updated: 2024/06/06 16:07:38 by mottjes          ###   ########.fr       */
+/*   Updated: 2024/08/28 17:46:21 by mottjes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,15 +72,15 @@ void	render_player(t_game *game)
 
 void	check_for_wall(t_game *game, t_player *p, int x, int y)
 {
-	if (((int)p->posX + x - 10 >= 0))
+	if (((int)p->pos_x + x - 10 >= 0))
 	{
-		if (((int)p->posX + x - 10 < game->map_widht))
+		if (((int)p->pos_x + x - 10 < game->map_widht))
 		{
-			if (((int)(p->posY) + y - 10) >= 0)
+			if (((int)(p->pos_y) + y - 10) >= 0)
 			{
-				if (((int)(p->posY) + y - 10) < game->map_height)
+				if (((int)(p->pos_y) + y - 10) < game->map_height)
 				{
-					if (map[(int)(p->posX) + x - 10][(int)(p->posY) + y - 10])
+					if (map[(int)(p->pos_x) + x - 10][(int)(p->pos_y) + y - 10])
 						render_sqare(game, x, y);
 					return ;
 				}

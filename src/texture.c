@@ -6,7 +6,7 @@
 /*   By: mottjes <mottjes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 12:22:10 by mottjes           #+#    #+#             */
-/*   Updated: 2024/06/26 15:50:59 by mottjes          ###   ########.fr       */
+/*   Updated: 2024/08/28 17:47:56 by mottjes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,14 +25,14 @@ t_texture	*choose_texture(t_game *game)
 {
 	if (game->ray.side)
 	{
-		if (game->ray.dirY < 0)
+		if (game->ray.dir_y < 0)
 			return (&game->texture_we);
 		else
 			return (&game->texture_no);
 	}
 	else
 	{
-		if (game->ray.dirX < 0)
+		if (game->ray.dir_x < 0)
 			return (&game->texture_so);
 		else
 			return (&game->texture_ea);
