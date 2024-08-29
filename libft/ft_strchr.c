@@ -6,7 +6,7 @@
 /*   By: mottjes <mottjes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/16 10:31:14 by mottjes           #+#    #+#             */
-/*   Updated: 2023/05/25 12:23:19 by mottjes          ###   ########.fr       */
+/*   Updated: 2024/08/29 14:49:18 by mottjes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ char	*ft_strchr(const char *s, int c)
 
 	character = (char)c;
 	ptr = (char *)s;
-	while (*ptr)
+	while (ptr && *ptr)
 	{
 		if (*ptr == character)
 			return (ptr);
