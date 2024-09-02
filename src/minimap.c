@@ -6,13 +6,11 @@
 /*   By: mottjes <mottjes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 16:51:19 by mottjes           #+#    #+#             */
-/*   Updated: 2024/08/28 17:46:21 by mottjes          ###   ########.fr       */
+/*   Updated: 2024/09/02 15:22:53 by mottjes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/cub3d.h"
-
-extern int	map[24][24];
 
 void	render_sqare(t_game *game, int x, int y)
 {
@@ -70,24 +68,25 @@ void	render_player(t_game *game)
 	}
 }
 
-void	check_for_wall(t_game *game, t_player *p, int x, int y)
+void	check_for_wall(t_game *g, t_player *p, int x, int y)
 {
 	if (((int)p->pos_x + x - 10 >= 0))
 	{
-		if (((int)p->pos_x + x - 10 < game->map_widht))
+		if (((int)p->pos_x + x - 10 < g->map_widht))
 		{
 			if (((int)(p->pos_y) + y - 10) >= 0)
 			{
-				if (((int)(p->pos_y) + y - 10) < game->map_height)
+				if (((int)(p->pos_y) + y - 10) < g->map_height)
 				{
-					if (map[(int)(p->pos_x) + x - 10][(int)(p->pos_y) + y - 10])
-						render_sqare(game, x, y);
+					if (g->map[(int)(p->pos_y) + y - 10]
+						[(int)(p->pos_x) + x - 10] != '0')
+						render_sqare(g, x, y);
 					return ;
 				}
 			}
 		}
 	}
-	render_sqare(game, x, y);
+	render_sqare(g, x, y);
 }
 
 void	render_minimap(t_game *game)

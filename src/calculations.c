@@ -6,13 +6,11 @@
 /*   By: mottjes <mottjes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 13:08:28 by mottjes           #+#    #+#             */
-/*   Updated: 2024/08/28 17:52:26 by mottjes          ###   ########.fr       */
+/*   Updated: 2024/09/02 15:16:26 by mottjes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/cub3d.h"
-
-extern int	map[24][24];
 
 double	ft_abs(double nbr)
 {
@@ -65,7 +63,7 @@ void	calculate_side_dist(t_game *game, t_ray *ray)
 	}
 }
 
-void	dda(t_ray *ray)
+void	dda(t_game *game, t_ray *ray)
 {
 	while (ray->hit == 0)
 	{
@@ -81,7 +79,7 @@ void	dda(t_ray *ray)
 			ray->map_y += ray->step_y;
 			ray->side = 1;
 		}
-		if (map[ray->map_x][ray->map_y] != 0)
+		if (game->map[ray->map_y][ray->map_x] == '1')
 			ray->hit = 1;
 	}
 	if (ray->side == 0)

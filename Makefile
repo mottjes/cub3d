@@ -8,10 +8,15 @@ SRC = 	src/main.c					\
 		src/calculations.c			\
 		src/minimap.c				\
 		src/texture.c   			\
+		src/parser.c 				\
+		src/parser_util1.c			\
+		src/parser_util2.c			\
+		src/parser_util3.c			\
+		src/parser_util4.c			\
 
 CC = gcc
 
-CFLAGS = #-Wall -Wextra -Werror -no-pie
+CFLAGS = -Wall -Werror -Wextra -no-pie
 
 OBJ = $(SRC:.c=.o)
 

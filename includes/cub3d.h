@@ -6,7 +6,7 @@
 /*   By: mottjes <mottjes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/28 16:57:51 by mottjes           #+#    #+#             */
-/*   Updated: 2024/08/28 17:39:55 by mottjes          ###   ########.fr       */
+/*   Updated: 2024/09/02 18:03:49 by mottjes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,11 +107,14 @@ typedef struct s_game
 	t_texture	texture_so;
 	t_texture	texture_ea;
 	t_texture	texture_we;
-	int			**map;
+	char		**map;
 	int			map_widht;
 	int			map_height;
 	int			color_ceiling;
 	int			color_floor;
+	int			r;
+	int			g;
+	int			b;
 }	t_game;
 
 //      init.c
@@ -128,7 +131,7 @@ void		render(t_game *game);
 double		ft_abs(double nbr);
 void		set_ray(t_game *game, t_ray *ray, int x);
 void		calculate_side_dist(t_game *game, t_ray *ray);
-void		dda(t_ray *ray);
+void		dda(t_game *game, t_ray *ray);
 void		calculate_line_height(t_ray *ray);
 
 //      texture.c
@@ -143,4 +146,34 @@ void		render_minimap(t_game *game);
 void		free_all(t_game *game);
 int			exit_game(t_game *game);
 
+//      parser.c
+int			cub_parser(char *path, t_game *data, int error);
+int			parse_prep(int fd_path, t_game *data, char *path, int error);
+int			parse_settings(int fd_path, t_game *data, char *line, int e);
+char		*line2tex(char *line);
+char		*pass_norminette(char*line, int fd_path, int *e);
+
+//      parser_util1.c
+void		floodfill_s(char **map, int x, int y, int *error);
+void		player_info(t_game *data, int x, int y);
+void		tidy_up_map(t_game *data, char **map, int x, int y);
+void		vibe_check(char **map, int x, int y, int *error);
+int			funfill(char **map, t_game *data, int x, int y);
+
+//      parser_util2.c
+int			outerfill(char **map, t_game *data, int x, int y);
+int			map_sizes(char **map, t_game *data, int wi, int l);
+void		row_ws(char **map, int y);
+char		**map_gen(char **map, t_game *data, char *line, int fd_path);
+int			settings_set(int fd_path, t_game *data, char *line);
+
+//      parser_util3.c
+int			eat_w(char *string);
+int			calc_color(t_game *data, char type);
+void		bruh(t_game *data, int *le, char *numba);
+int			color_hex(t_game *data, char *line, char type, int i);
+int			parse_color(t_game *data, char *line, char type, int i);
+
+//		parser_util4.c
+int			check_path(char *path);
 #endif

@@ -1,28 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   init.c                                             :+:      :+:    :+:   */
+/*   parser_util4.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mottjes <mottjes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/05/23 12:21:52 by mottjes           #+#    #+#             */
-/*   Updated: 2024/09/02 15:18:33 by mottjes          ###   ########.fr       */
+/*   Created: 2024/09/02 17:38:37 by pmichale          #+#    #+#             */
+/*   Updated: 2024/09/02 18:04:40 by mottjes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/cub3d.h"
-
-void	init_mlx(t_game *game)
+int	check_path(char *path)
 {
-	game->mlx = mlx_init();
-	game->window = mlx_new_window(game->mlx, SCREEN_WIDTH,
-			SCREEN_HEIGHT, "cub3d");
-}
+	int	i;
 
-void	init_ray(t_ray *ray, t_player *player)
-{
-	ray->dir_x = player->dir_x;
-	ray->dir_y = player->dir_y;
-	ray->plane_x = ray->dir_y * FOV;
-	ray->plane_y = ray->dir_x * -FOV;
+	i = 0;
+	while (path[i])
+		i++;
+	if (path[i - 1] != 'b' && path[i - 2] != 'u'
+		&& path[i - 3] != 'c' && path[i - 4] != '.')
+		return (1);
+	return (0);
 }

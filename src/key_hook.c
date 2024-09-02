@@ -6,27 +6,25 @@
 /*   By: mottjes <mottjes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 12:21:39 by mottjes           #+#    #+#             */
-/*   Updated: 2024/08/28 17:53:21 by mottjes          ###   ########.fr       */
+/*   Updated: 2024/09/02 15:17:31 by mottjes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/cub3d.h"
 
-extern int	map[24][24];
-
 bool	collision(t_game *game, double x, double y)
 {
-	if (map[(int)(x + 0.1)][(int)y])
+	if (game->map[(int)y][(int)(x + 0.1)] != '0')
 		return (true);
-	if (map[(int)(x + 0.1)][(int)(y + 0.1)])
+	if (game->map[(int)(y + 0.1)][(int)(x + 0.1)] != '0')
 		return (true);
-	if (map[(int)x][(int)(y + 0.1)])
+	if (game->map[(int)(y + 0.1)][(int)x] != '0')
 		return (true);
-	if (map[(int)(x - 0.1)][(int)y])
+	if (game->map[(int)y][(int)(x - 0.1)] != '0')
 		return (true);
-	if (map[(int)x][(int)(y - 0.1)])
+	if (game->map[(int)(y - 0.1)][(int)x] != '0')
 		return (true);
-	if (map[(int)(x - 0.1)][(int)(y - 0.1)])
+	if (game->map[(int)(y - 0.1)][(int)(x - 0.1)] != '0')
 		return (true);
 	return (false);
 }

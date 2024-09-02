@@ -6,13 +6,11 @@
 /*   By: mottjes <mottjes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 12:21:56 by mottjes           #+#    #+#             */
-/*   Updated: 2024/08/28 17:59:28 by mottjes          ###   ########.fr       */
+/*   Updated: 2024/09/02 14:37:51 by mottjes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/cub3d.h"
-
-extern int	map[24][24];
 
 void	render_texture_line_2(t_game *game, t_texture *texture, int x)
 {
@@ -80,7 +78,7 @@ void	render_line(int x, t_game *game, t_ray *ray)
 {
 	set_ray(game, ray, x);
 	calculate_side_dist(game, ray);
-	dda(ray);
+	dda(game, ray);
 	calculate_line_height(ray);
 	render_texture_line(game, ray, x);
 	render_floor_ceiling(game, x);
