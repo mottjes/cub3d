@@ -6,7 +6,7 @@ This project is a simple raycaster to simulate 3d rooms, like in the old Wolfens
 
 We used the school graphical library: the MiniLibX for doing the graphical stuff. (Linux only)
 
-Features of the game:
+### Features of the game:
 
   1. W, A, S and D keys to move the player
 
@@ -26,9 +26,7 @@ For more detail: The subject pdf is inside of the project folder.
 
 ### How To Play The Game
 
-  ``git clone --recurse-submodules --remote-submodules https://github.com/mottjes/cub3d.git``
-
-  to clone the project
+  ``git clone --recurse-submodules --remote-submodules https://github.com/mottjes/cub3d.git`` to clone the project
 
   ``make`` to compile and to create the excutable
   

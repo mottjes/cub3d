@@ -3,9 +3,8 @@ SO ./textures/shrader.xpm
 WE ./textures/pepe.xpm
 EA ./textures/shrek.xpm
 
-F 105,59,44
-C 163,157,155
-F 167,59,255
+F 115,72,40
+C 166,151,139
 
 
         11111111111111111111111111
