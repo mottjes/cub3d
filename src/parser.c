@@ -6,7 +6,7 @@
 /*   By: mottjes <mottjes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/26 09:56:05 by pmichale          #+#    #+#             */
-/*   Updated: 2024/09/02 18:00:50 by mottjes          ###   ########.fr       */
+/*   Updated: 2024/09/03 13:04:42 by mottjes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,13 +33,18 @@ char	*pass_norminette(char *line, int fd_path, int *e)
 	return (line);
 }
 
-char	*line2tex(char *line)
+char	*line2tex(char *line, t_texture tex, int *error)
 {
 	char	*funny;
 	int		lol;
 	int		i;
 	int		y;
 
+	if (tex.path != 0)
+	{
+		*error = 2;
+		return (tex.path);
+	}
 	lol = 0;
 	i = eat_w(line);
 	y = eat_w(&line[i + 2]);
@@ -61,22 +66,21 @@ int	parse_settings(int fd_path, t_game *data, char *line, int e)
 		line = pass_norminette(line, fd_path, &e);
 		if (e == 1)
 			return (1);
-		if (line[eat_w(line)] == 'N' && line[eat_w(line) + 1] == 'O')
-			data->texture_no.path = line2tex(line);
-		else if (line[eat_w(line)] == 'S' && line[eat_w(line) + 1] == 'O')
-			data->texture_so.path = line2tex(line);
-		else if (line[eat_w(line)] == 'E' && line[eat_w(line) + 1] == 'A')
-			data->texture_ea.path = line2tex(line);
-		else if (line[eat_w(line)] == 'W' && line[eat_w(line) + 1] == 'E')
-			data->texture_we.path = line2tex(line);
+		if (parse_more(line, data, &e))
+			e = e + 0;
 		else if (line[eat_w(line)] == 'F')
 			e = parse_color(data, &line[eat_w(&line[eat_w(line) + 1])], 'F', 0);
 		else if (line[eat_w(line)] == 'C')
 			e = parse_color(data, &line[eat_w(&line[eat_w(line) + 1])], 'C', 0);
 		else
 			return (settings_set(fd_path, data, line));
+		if (e == 2)
+			return (1);
 		if (e == 1)
+		{
+			free(line);
 			return (7);
+		}
 	}
 	return (1);
 }
