@@ -16,7 +16,7 @@ SRC = 	src/main.c					\
 
 CC = gcc
 
-CFLAGS = -Wall -Werror -Wextra -no-pie -fsanitize=address -g
+CFLAGS = -Wall -Werror -Wextra -no-pie
 
 OBJ = $(SRC:.c=.o)
 
