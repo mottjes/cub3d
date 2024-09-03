@@ -6,7 +6,7 @@
 /*   By: mottjes <mottjes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 12:21:39 by mottjes           #+#    #+#             */
-/*   Updated: 2024/09/02 15:17:31 by mottjes          ###   ########.fr       */
+/*   Updated: 2024/09/03 15:19:38 by mottjes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,17 +51,17 @@ void	move_player_a_d(t_game *game, t_player *p, int dir)
 {
 	if (dir > 0)
 	{
-		if (!collision(game, p->pos_x - p->dir_y * MOVE_SPEED, p->pos_y))
-			p->pos_x -= p->dir_y * MOVE_SPEED;
-		if (!collision(game, p->pos_x, p->pos_y + p->dir_x * MOVE_SPEED))
-			p->pos_y += p->dir_x * MOVE_SPEED;
-	}
-	else if (dir < 0)
-	{
 		if (!collision(game, p->pos_x + p->dir_y * MOVE_SPEED, p->pos_y))
 			p->pos_x += p->dir_y * MOVE_SPEED;
 		if (!collision(game, p->pos_x, p->pos_y - p->dir_x * MOVE_SPEED))
 			p->pos_y -= p->dir_x * MOVE_SPEED;
+	}
+	else if (dir < 0)
+	{
+		if (!collision(game, p->pos_x - p->dir_y * MOVE_SPEED, p->pos_y))
+			p->pos_x -= p->dir_y * MOVE_SPEED;
+		if (!collision(game, p->pos_x, p->pos_y + p->dir_x * MOVE_SPEED))
+			p->pos_y += p->dir_x * MOVE_SPEED;
 	}
 }
 
@@ -73,6 +73,17 @@ void	rotate_player(t_player *p, t_ray *r, bool clockwise)
 	if (clockwise)
 	{
 		olddir_x = p->dir_x;
+		p->dir_x = p->dir_x * cos(ROT_SPEED) - p->dir_y * sin(ROT_SPEED);
+		p->dir_y = olddir_x * sin(ROT_SPEED) + p->dir_y * cos(ROT_SPEED);
+		oldplane_x = r->plane_x;
+		r->plane_x = r->plane_x * cos(ROT_SPEED)
+			- r->plane_y * sin(ROT_SPEED);
+		r->plane_y = oldplane_x * sin(ROT_SPEED)
+			+ r->plane_y * cos(ROT_SPEED);
+	}
+	else
+	{
+		olddir_x = p->dir_x;
 		p->dir_x = p->dir_x * cos(-ROT_SPEED) - p->dir_y * sin(-ROT_SPEED);
 		p->dir_y = olddir_x * sin(-ROT_SPEED) + p->dir_y * cos(-ROT_SPEED);
 		oldplane_x = r->plane_x;
@@ -80,15 +91,6 @@ void	rotate_player(t_player *p, t_ray *r, bool clockwise)
 			- r->plane_y * sin(-ROT_SPEED);
 		r->plane_y = oldplane_x * sin(-ROT_SPEED)
 			+ r->plane_y * cos(-ROT_SPEED);
-	}
-	else
-	{
-		olddir_x = p->dir_x;
-		p->dir_x = p->dir_x * cos(ROT_SPEED) - p->dir_y * sin(ROT_SPEED);
-		p->dir_y = olddir_x * sin(ROT_SPEED) + p->dir_y * cos(ROT_SPEED);
-		oldplane_x = r->plane_x;
-		r->plane_x = r->plane_x * cos(ROT_SPEED) - r->plane_y * sin(ROT_SPEED);
-		r->plane_y = oldplane_x * sin(ROT_SPEED) + r->plane_y * cos(ROT_SPEED);
 	}
 }
 

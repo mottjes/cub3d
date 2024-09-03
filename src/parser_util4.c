@@ -6,7 +6,7 @@
 /*   By: mottjes <mottjes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 17:38:37 by pmichale          #+#    #+#             */
-/*   Updated: 2024/09/03 12:55:25 by mottjes          ###   ########.fr       */
+/*   Updated: 2024/09/03 15:06:26 by mottjes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,10 @@ int	check_path(char *path)
 	int	i;
 
 	i = 0;
-	while(path[i])
+	while (path[i])
 		i++;
-	if (path[i - 1] == 'b' && path[i - 2] == 'u' 
-			&& path[i - 3] == 'c' && path[i - 4] == '.')
+	if (path[i - 1] == 'b' && path[i - 2] == 'u'
+		&& path[i - 3] == 'c' && path[i - 4] == '.')
 		return (0);
 	return (1);
 }

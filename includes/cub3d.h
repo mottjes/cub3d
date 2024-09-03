@@ -6,7 +6,7 @@
 /*   By: mottjes <mottjes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/28 16:57:51 by mottjes           #+#    #+#             */
-/*   Updated: 2024/09/03 12:51:17 by mottjes          ###   ########.fr       */
+/*   Updated: 2024/09/03 15:15:55 by mottjes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,34 +147,35 @@ void		free_all(t_game *game);
 int			exit_game(t_game *game);
 
 //      parser.c
-int            cub_parser(char *path, t_game *data, int error);
-int            parse_prep(int fd_path, t_game *data, char *path, int error);
-int            parse_settings(int fd_path, t_game *data, char *line, int e);
-char        *line2tex(char *line, t_texture tex, int *error);
-char        *pass_norminette(char*line, int fd_path, int *e);
+int			cub_parser(char *path, t_game *data, int error);
+int			parse_prep(int fd_path, t_game *data, char *path, int error);
+int			parse_settings(int fd_path, t_game *data, char *line, int e);
+char		*line2tex(char *line, t_texture tex, int *error);
+char		*pass_norminette(char*line, int fd_path, int *e);
 
 //      parser_util1.c
-void        floodfill_s(char **map, int x, int y, int *error);
-void        player_info(t_game *data, int x, int y);
-void        tidy_up_map(t_game *data, char **map, int x, int y);
-void        vibe_check(char **map, int x, int y, int *error);
-int            funfill(char **map, t_game *data, int x, int y);
+void		floodfill_s(char **map, int x, int y, int *error);
+void		player_info(t_game *data, int x, int y);
+void		tidy_up_map(t_game *data, char **map, int x, int y);
+void		vibe_check(char **map, int x, int y, int *error);
+int			funfill(char **map, t_game *data, int x, int y);
 
 //      parser_util2.c
-int            outerfill(char **map, t_game *data, int x, int y);
-int            map_sizes(char **map, t_game *data, int wi, int l);
-void        row_ws(char **map, int y);
-char        **map_gen(char **map, t_game *data, char *line, int fd_path);
-int            settings_set(int fd_path, t_game *data, char *line);
+int			outerfill(char **map, t_game *data, int x, int y);
+int			map_sizes(char **map, t_game *data, int wi, int l);
+void		row_ws(char **map, int y);
+char		**map_gen(char **map, t_game *data, char *line, int fd_path);
+int			settings_set(int fd_path, t_game *data, char *line);
 
 //      parser_util3.c
-int            eat_w(char *string);
-int            calc_color(t_game *data, char type);
-void        bruh(t_game *data, int *le, char *numba);
-int            color_hex(t_game *data, char *line, char type, int i);
-int            parse_color(t_game *data, char *line, char type, int i);
+int			eat_w(char *string);
+int			calc_color(t_game *data, char type);
+void		bruh(t_game *data, int *le, char *numba);
+int			color_hex(t_game *data, char *line, char type, int i);
+int			parse_color(t_game *data, char *line, char type, int i);
 
 //        parser_util4.c
-int        check_path(char *path);
-int        parse_more(char *line, t_game *data, int *error);
+int			check_path(char *path);
+int			parse_more(char *line, t_game *data, int *error);
+
 #endif
