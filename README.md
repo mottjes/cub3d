@@ -1,5 +1,7 @@
 # Cub3d
 
+![Screenshot from 2024-11-25 16-18-55](https://github.com/user-attachments/assets/390be631-1de7-479d-b10e-fe8a11e87f2e)
+
 ### Description
 
 This project is a simple raycaster to simulate 3d rooms, like in the old Wolfenstein 3D game.
